@@ -42,13 +42,13 @@ export const products: Product[] = [
 
     name: "Gece Yarısı",
 
-    eyebrow: "FLOREA SIGNATURE",
+    eyebrow: "Bİ BUKET NEŞE / ÖZEL SEÇKİ",
 
     subtitle:
       "Bazı şeyler gece daha kolay söylenir.",
 
     description:
-      "Derin kırmızı tonları, güçlü duruşu ve zamansız karakteriyle Gece Yarısı; kelimelerin yetersiz kaldığı anlar için tasarlandı.",
+      "Derin kırmızı tonları, güçlü duruşu ve zamansız karakteriyle Gece Yarısı; kelimelerin yetersiz kaldığı anlar için hazırlandı.",
 
     flowerName: "Kırmızı Gül",
 
@@ -71,7 +71,7 @@ export const products: Product[] = [
       },
       {
         count: 24,
-        label: "Signature",
+        label: "Klasik",
         price: 2990,
       },
       {
@@ -128,13 +128,13 @@ export const products: Product[] = [
 
     name: "Sessiz Özür",
 
-    eyebrow: "FLOREA EMOTION",
+    eyebrow: "Bİ BUKET NEŞE / DUYGU KOLEKSİYONU",
 
     subtitle:
       "Bazen en güçlü özür, sessizce gelir.",
 
     description:
-      "Yumuşak tonlarda çiçekler ve sade bir sunum. Sessiz Özür, yeniden başlamak istediğin anlar için tasarlandı.",
+      "Yumuşak tonlardaki çiçekleri ve sade sunumuyla Sessiz Özür; yeniden başlamak, gönül almak ve söylenemeyeni anlatmak istediğin anlar için hazırlandı.",
 
     flowerName: "Beyaz & Pudra",
 
@@ -153,7 +153,7 @@ export const products: Product[] = [
       },
       {
         count: 24,
-        label: "Signature",
+        label: "Klasik",
         price: 2690,
       },
       {
@@ -210,13 +210,13 @@ export const products: Product[] = [
 
     name: "İlk Gün",
 
-    eyebrow: "FLOREA MOMENTS",
+    eyebrow: "Bİ BUKET NEŞE / ÖZEL ANLAR",
 
     subtitle:
       "Yeni başlangıçların enerjisi.",
 
     description:
-      "Canlı renkler ve enerjik bir kompozisyon. Kutlamalar, yeni başlangıçlar ve güzel haberler için.",
+      "Canlı renkler ve enerjik bir kompozisyon. Doğum günleri, kutlamalar, yeni başlangıçlar ve güzel haberler için neşeli bir seçim.",
 
     flowerName: "Mevsim Çiçekleri",
 
@@ -235,7 +235,7 @@ export const products: Product[] = [
       },
       {
         count: 24,
-        label: "Signature",
+        label: "Klasik",
         price: 2490,
       },
       {

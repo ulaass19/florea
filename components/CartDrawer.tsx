@@ -13,6 +13,42 @@ import {
   useCart,
 } from "@/context/CartContext";
 
+/*
+  WhatsApp sipariş hattı.
+
+  Buraya işletmenin numarasını:
+  ülke koduyla,
+  + işareti ve boşluk olmadan yazacağız.
+
+  Örnek:
+  905551234567
+*/
+const WHATSAPP_NUMBER =
+  "905551234567";
+
+/*
+  Ürün adından URL slug oluşturuyoruz.
+
+  Örnek:
+  Gece Yarısı -> gece-yarisi
+  Sessiz Özür -> sessiz-ozur
+  İlk Gün -> ilk-gun
+*/
+function createSlug(
+  text: string
+) {
+  return text
+    .toLocaleLowerCase("tr-TR")
+    .replace(/ğ/g, "g")
+    .replace(/ü/g, "u")
+    .replace(/ş/g, "s")
+    .replace(/ı/g, "i")
+    .replace(/ö/g, "o")
+    .replace(/ç/g, "c")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function CartDrawer() {
   const {
     items,
@@ -37,9 +73,7 @@ export default function CartDrawer() {
     body scroll'u kapatıyoruz.
   */
   useEffect(() => {
-    if (
-      !isCartOpen
-    ) {
+    if (!isCartOpen) {
       return;
     }
 
@@ -47,15 +81,120 @@ export default function CartDrawer() {
       document.body.style
         .overflow;
 
-    document.body.style
-      .overflow = "hidden";
+    document.body.style.overflow =
+      "hidden";
 
     return () => {
-      document.body.style
-        .overflow =
+      document.body.style.overflow =
         oldOverflow;
     };
   }, [isCartOpen]);
+
+  /*
+    WhatsApp sipariş mesajı oluşturur.
+  */
+  const handleWhatsAppOrder =
+    () => {
+      if (
+        items.length === 0
+      ) {
+        return;
+      }
+
+      /*
+        Localhost'ta:
+        http://localhost:3000
+
+        Canlıya çıktığında:
+        https://bibuketnese.com
+
+        otomatik olarak kullanılacak.
+      */
+      const siteUrl =
+        window.location.origin;
+
+      const productLines =
+        items
+          .map(
+            (
+              item,
+              index
+            ) => {
+              const slug =
+                createSlug(
+                  item.name
+                );
+
+              const productUrl =
+  `${siteUrl}/urunler/${slug}`;
+
+              const itemTotal =
+                item.unitPrice *
+                item.quantity;
+
+              let productText =
+                `${index + 1}. *${item.name}*\n`;
+
+              productText +=
+                `• Çiçek: ${item.size} ${item.flowerName}\n`;
+
+              productText +=
+                `• Ambalaj: ${item.wrap}\n`;
+
+              productText +=
+                `• Kart: ${item.card}\n`;
+
+              productText +=
+                `• Adet: ${item.quantity}\n`;
+
+              if (
+                item.message
+              ) {
+                productText +=
+                  `• Kart Mesajı: "${item.message}"\n`;
+              }
+
+              productText +=
+                `• Fiyat: ₺${itemTotal.toLocaleString(
+                  "tr-TR"
+                )}\n`;
+
+              productText +=
+                `• Ürün Linki: ${productUrl}`;
+
+              return productText;
+            }
+          )
+          .join(
+            "\n\n"
+          );
+
+      const message =
+        `Merhaba Bi Buket Neşe 🌸\n\n` +
+        `Aşağıdaki ürünleri sipariş vermek istiyorum:\n\n` +
+        `${productLines}\n\n` +
+        `━━━━━━━━━━━━━━\n` +
+        `*Toplam: ₺${subtotal.toLocaleString(
+          "tr-TR"
+        )}*\n` +
+        `━━━━━━━━━━━━━━\n\n` +
+        `Bu ürünleri sipariş vermek istiyorum. ` +
+        `Teslimat ve IBAN ödeme bilgileri konusunda yardımcı olabilir misiniz? 🌷`;
+
+      const encodedMessage =
+        encodeURIComponent(
+          message
+        );
+
+      const whatsappUrl =
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+      window.open(
+        whatsappUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    };
 
   return (
     <AnimatePresence>
@@ -100,7 +239,7 @@ export default function CartDrawer() {
             <div className="cartHeader">
               <div>
                 <p>
-                  FLOREA
+                  Bİ BUKET NEŞE
                 </p>
 
                 <h2>
@@ -129,16 +268,17 @@ export default function CartDrawer() {
                 <h3>
                   Henüz bir şey
                   <br />
+
                   <em>
-                    söylemedin.
+                    seçmedin.
                   </em>
                 </h3>
 
                 <p>
                   Bir çiçek seç.
-                  Gerisini
-                  Florea&apos;ya
-                  bırak.
+                  <br />
+                  Neşeni biz
+                  hazırlayalım.
                 </p>
 
                 <button
@@ -151,6 +291,7 @@ export default function CartDrawer() {
                 >
                   Koleksiyonları
                   Keşfet
+
                   <span>
                     ↗
                   </span>
@@ -195,8 +336,8 @@ export default function CartDrawer() {
                           <div className="cartItemTop">
                             <div>
                               <small>
-                                FLOREA
-                                SIGNATURE
+                                Bİ BUKET
+                                NEŞE
                               </small>
 
                               <h3>
@@ -261,6 +402,7 @@ export default function CartDrawer() {
                                     item.cartId
                                   )
                                 }
+                                aria-label="Adedi azalt"
                               >
                                 −
                               </button>
@@ -277,6 +419,7 @@ export default function CartDrawer() {
                                     item.cartId
                                   )
                                 }
+                                aria-label="Adedi artır"
                               >
                                 +
                               </button>
@@ -311,22 +454,23 @@ export default function CartDrawer() {
                     </button>
 
                     <span>
-                      Vergiler
-                      dahil
+                      Fiyatlar
+                      günceldir
                     </span>
                   </div>
 
                   <div className="cartTotal">
                     <div>
                       <small>
-                        ARA TOPLAM
+                        TOPLAM
                       </small>
 
                       <p>
-                        Teslimat
-                        bilgileri
-                        sonraki
-                        adımda.
+                        Teslimat ve
+                        ödeme bilgileri
+                        WhatsApp
+                        üzerinden
+                        tamamlanır.
                       </p>
                     </div>
 
@@ -339,23 +483,14 @@ export default function CartDrawer() {
                   </div>
 
                   <button
-                    className="checkoutButton"
-                    onClick={() => {
-                      closeCart();
-
-                      /*
-                        Checkout
-                        sayfasını
-                        birazdan
-                        oluşturacağız.
-                      */
-
-                      window.location.href =
-                        "/checkout";
-                    }}
+                    className="checkoutButton whatsappOrderButton"
+                    onClick={
+                      handleWhatsAppOrder
+                    }
                   >
                     <span>
-                      Ödemeye Geç
+                      WhatsApp&apos;tan
+                      Sipariş Ver
                     </span>
 
                     <span>
@@ -364,8 +499,11 @@ export default function CartDrawer() {
                   </button>
 
                   <div className="cartSecurity">
-                    GÜVENLİ ÖDEME
-                    · FLOREA
+                    SİPARİŞ
+                    DETAYLARIN
+                    WHATSAPP&apos;A
+                    OTOMATİK
+                    AKTARILIR
                   </div>
                 </div>
               </>

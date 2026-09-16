@@ -1,135 +1,493 @@
-"use client";
+'use client';
 
 import {
   motion,
   useScroll,
   useTransform,
-} from "framer-motion";
-import { useRef } from "react";
+} from 'framer-motion';
+
 import {
-  useCart,
-} from "@/context/CartContext";
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-const moods = [
-  {
-    title: "Seni Seviyorum",
-    text: "Kırmızı güller, yoğun tonlar ve güçlü bir ifade.",
-  },
-  {
-    title: "Özür Dilerim",
-    text: "Daha sakin, zarif ve yumuşak bir seçim.",
-  },
-  {
-    title: "İyi ki Doğdun",
-    text: "Canlı renkler ve enerjik bir buket.",
-  },
-  {
-    title: "İçimden Geldi",
-    text: "Sebepsiz ama unutulmayacak bir jest.",
-  },
-];
+type ProductSize = {
+  id: string;
+  count: number;
+  price: number;
+  isActive: boolean;
+  sortOrder: number;
+};
 
-function ProductShowcase() {
-  const sectionRef = useRef<HTMLElement>(null);
+type ProductWrap = {
+  id: string;
+  name: string;
+  extraPrice: number;
+  isActive: boolean;
+  sortOrder: number;
+};
 
-  const { scrollYProgress } = useScroll({
+type ProductCategory = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+type Product = {
+  id: string;
+  slug: string;
+  name: string;
+  subtitle?: string | null;
+  description?: string | null;
+  heroImage?: string | null;
+  flowerName?: string | null;
+  isActive: boolean;
+  isFeatured: boolean;
+  categories?: ProductCategory[];
+  sizes?: ProductSize[];
+  wraps?: ProductWrap[];
+};
+
+type CollectionProduct = {
+  sortOrder: number;
+  product: Product;
+};
+
+type Collection = {
+  id: string;
+  slug: string;
+  name: string;
+  subtitle?: string | null;
+  description?: string | null;
+  image?: string | null;
+  isActive: boolean;
+  isFeatured: boolean;
+  sortOrder: number;
+  products: CollectionProduct[];
+};
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  'http://localhost:3001';
+
+function getMinimumPrice(
+  product?: Product | null,
+) {
+  if (!product) {
+    return null;
+  }
+
+  const prices =
+    product.sizes
+      ?.filter(
+        (size) =>
+          size.isActive,
+      )
+      .map(
+        (size) =>
+          Number(size.price),
+      )
+      .filter(
+        (price) =>
+          Number.isFinite(price),
+      ) ?? [];
+
+  if (
+    prices.length === 0
+  ) {
+    return null;
+  }
+
+  return Math.min(
+    ...prices,
+  );
+}
+
+function getDefaultSize(
+  product?: Product | null,
+) {
+  if (!product) {
+    return null;
+  }
+
+  const activeSizes =
+    product.sizes
+      ?.filter(
+        (size) =>
+          size.isActive,
+      )
+      .sort(
+        (a, b) =>
+          a.sortOrder -
+          b.sortOrder,
+      ) ?? [];
+
+  if (
+    activeSizes.length === 0
+  ) {
+    return null;
+  }
+
+  return activeSizes[0];
+}
+
+function getDefaultWrap(
+  product?: Product | null,
+) {
+  if (!product) {
+    return null;
+  }
+
+  const wraps =
+    product.wraps
+      ?.filter(
+        (wrap) =>
+          wrap.isActive,
+      )
+      .sort(
+        (a, b) =>
+          a.sortOrder -
+          b.sortOrder,
+      ) ?? [];
+
+  return wraps[0] ?? null;
+}
+
+function formatPrice(
+  price: number,
+) {
+  return new Intl.NumberFormat(
+    'tr-TR',
+    {
+      style: 'currency',
+      currency: 'TRY',
+      maximumFractionDigits: 0,
+    },
+  ).format(price);
+}
+
+function splitTitle(
+  title: string,
+) {
+  const words =
+    title
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+  if (
+    words.length <= 1
+  ) {
+    return {
+      first:
+        words[0] ?? '',
+      second: '',
+    };
+  }
+
+  return {
+    first:
+      words
+        .slice(
+          0,
+          words.length - 1,
+        )
+        .join(' '),
+
+    second:
+      words[
+        words.length - 1
+      ],
+  };
+}
+
+function getCollectionProduct(
+  collection: Collection,
+) {
+  const products =
+    [...(
+      collection.products ??
+      []
+    )].sort(
+      (a, b) =>
+        a.sortOrder -
+        b.sortOrder,
+    );
+
+  return (
+    products.find(
+      (item) =>
+        item.product
+          .isActive,
+    )?.product ??
+    products[0]?.product ??
+    null
+  );
+}
+
+function ProductShowcase({
+  product,
+}: {
+  product: Product | null;
+}) {
+  const sectionRef =
+    useRef<HTMLElement>(
+      null,
+    );
+
+  const {
+    scrollYProgress,
+  } = useScroll({
     target: sectionRef,
-    offset: ["start start", "end end"],
+    offset: [
+      'start start',
+      'end end',
+    ],
   });
 
-  /*
-    Scroll ilerledikçe:
-    0.00 → ürün küçük
-    0.20 → ürün büyüyor
-    0.35 → ilk metin gidiyor
-    0.50 → ikinci metin geliyor
-    0.70 → ikinci metin gidiyor
-    0.82 → final geliyor
-  */
+  const flowerScale =
+    useTransform(
+      scrollYProgress,
+      [
+        0,
+        0.25,
+        0.55,
+        0.8,
+        1,
+      ],
+      [
+        0.72,
+        0.92,
+        1.08,
+        1.18,
+        1.25,
+      ],
+    );
 
-  const flowerScale = useTransform(
-    scrollYProgress,
-    [0, 0.25, 0.55, 0.8, 1],
-    [0.72, 0.92, 1.08, 1.18, 1.25]
-  );
+  const flowerY =
+    useTransform(
+      scrollYProgress,
+      [
+        0,
+        0.45,
+        1,
+      ],
+      [
+        80,
+        0,
+        -25,
+      ],
+    );
 
-  const flowerY = useTransform(
-    scrollYProgress,
-    [0, 0.45, 1],
-    [80, 0, -25]
-  );
+  const flowerRotate =
+    useTransform(
+      scrollYProgress,
+      [
+        0,
+        0.5,
+        1,
+      ],
+      [
+        -3,
+        0,
+        2,
+      ],
+    );
 
-  const flowerRotate = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    [-3, 0, 2]
-  );
+  const backgroundScale =
+    useTransform(
+      scrollYProgress,
+      [
+        0,
+        1,
+      ],
+      [
+        1,
+        1.08,
+      ],
+    );
 
-  const backgroundScale = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [1, 1.08]
-  );
+  const backgroundOpacity =
+    useTransform(
+      scrollYProgress,
+      [
+        0,
+        0.45,
+        1,
+      ],
+      [
+        0.28,
+        0.42,
+        0.55,
+      ],
+    );
 
-  const backgroundOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.45, 1],
-    [0.28, 0.42, 0.55]
-  );
+  const introOpacity =
+    useTransform(
+      scrollYProgress,
+      [
+        0,
+        0.1,
+        0.28,
+        0.38,
+      ],
+      [
+        0,
+        1,
+        1,
+        0,
+      ],
+    );
 
-  const introOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.1, 0.28, 0.38],
-    [0, 1, 1, 0]
-  );
+  const introY =
+    useTransform(
+      scrollYProgress,
+      [
+        0,
+        0.12,
+        0.38,
+      ],
+      [
+        60,
+        0,
+        -60,
+      ],
+    );
 
-  const introY = useTransform(
-    scrollYProgress,
-    [0, 0.12, 0.38],
-    [60, 0, -60]
-  );
+  const detailOpacity =
+    useTransform(
+      scrollYProgress,
+      [
+        0.34,
+        0.46,
+        0.64,
+        0.73,
+      ],
+      [
+        0,
+        1,
+        1,
+        0,
+      ],
+    );
 
-  const detailOpacity = useTransform(
-    scrollYProgress,
-    [0.34, 0.46, 0.64, 0.73],
-    [0, 1, 1, 0]
-  );
+  const detailX =
+    useTransform(
+      scrollYProgress,
+      [
+        0.34,
+        0.48,
+        0.73,
+      ],
+      [
+        60,
+        0,
+        -30,
+      ],
+    );
 
-  const detailX = useTransform(
-    scrollYProgress,
-    [0.34, 0.48, 0.73],
-    [60, 0, -30]
-  );
+  const packagingOpacity =
+    useTransform(
+      scrollYProgress,
+      [
+        0.55,
+        0.67,
+        0.76,
+      ],
+      [
+        0,
+        1,
+        0,
+      ],
+    );
 
-  const packagingOpacity = useTransform(
-    scrollYProgress,
-    [0.55, 0.67, 0.76],
-    [0, 1, 0]
-  );
+  const packagingX =
+    useTransform(
+      scrollYProgress,
+      [
+        0.55,
+        0.67,
+        0.76,
+      ],
+      [
+        -70,
+        0,
+        40,
+      ],
+    );
 
-  const packagingX = useTransform(
-    scrollYProgress,
-    [0.55, 0.67, 0.76],
-    [-70, 0, 40]
-  );
+  const finalOpacity =
+    useTransform(
+      scrollYProgress,
+      [
+        0.74,
+        0.86,
+        1,
+      ],
+      [
+        0,
+        1,
+        1,
+      ],
+    );
 
-  const finalOpacity = useTransform(
-    scrollYProgress,
-    [0.74, 0.86, 1],
-    [0, 1, 1]
-  );
+  const finalY =
+    useTransform(
+      scrollYProgress,
+      [
+        0.74,
+        0.88,
+      ],
+      [
+        60,
+        0,
+      ],
+    );
 
-  const finalY = useTransform(
-    scrollYProgress,
-    [0.74, 0.88],
-    [60, 0]
-  );
+  const progressWidth =
+    useTransform(
+      scrollYProgress,
+      [
+        0,
+        1,
+      ],
+      [
+        '0%',
+        '100%',
+      ],
+    );
 
-  const progressWidth = useTransform(
-    scrollYProgress,
-    [0, 1],
-    ["0%", "100%"]
-  );
+  if (!product) {
+    return null;
+  }
+
+  const title =
+    splitTitle(
+      product.name,
+    );
+
+  const size =
+    getDefaultSize(
+      product,
+    );
+
+  const wrap =
+    getDefaultWrap(
+      product,
+    );
+
+  const price =
+    getMinimumPrice(
+      product,
+    );
+
+  const flowerName =
+    product.flowerName ??
+    product.categories?.[0]
+      ?.name ??
+    'Çiçek';
 
   return (
     <section
@@ -140,136 +498,227 @@ function ProductShowcase() {
         <motion.div
           className="showcaseBackground"
           style={{
-            scale: backgroundScale,
-            opacity: backgroundOpacity,
+            scale:
+              backgroundScale,
+            opacity:
+              backgroundOpacity,
           }}
         />
 
         <div className="showcaseShade" />
 
         <div className="showcaseTop">
-          <span>FLOREA SIGNATURE / 01</span>
+          <span>
+            Bİ BUKET NEŞE /
+            ÖZEL SEÇKİ
+          </span>
 
-          <span>SCROLL TO DISCOVER</span>
+          <span>
+            KEŞFETMEK İÇİN
+            KAYDIR
+          </span>
         </div>
 
         <motion.div
           className="showcaseFlower"
           style={{
-            scale: flowerScale,
+            scale:
+              flowerScale,
             y: flowerY,
-            rotate: flowerRotate,
+            rotate:
+              flowerRotate,
           }}
         >
           <div className="showcaseFlowerGlow" />
 
-          <img
-            src="https://images.unsplash.com/photo-1548094967-e25a127d1f6d?auto=format&fit=crop&w=1600&q=95"
-            alt="Gece Yarısı kırmızı gül buketi"
-          />
+          {product.heroImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={
+                product.heroImage
+              }
+              alt={
+                product.name
+              }
+            />
+          )}
         </motion.div>
 
         <motion.div
           className="showcaseIntro"
           style={{
-            opacity: introOpacity,
+            opacity:
+              introOpacity,
             y: introY,
           }}
         >
-          <span className="showcaseStep">01</span>
+          <span className="showcaseStep">
+            01
+          </span>
 
-          <p>FLOREA SIGNATURE</p>
+          <p>
+            Bİ BUKET NEŞE
+            SEÇKİSİ
+          </p>
 
           <h2>
-            Gece
-            <br />
-            <em>Yarısı.</em>
+            {title.first}
+
+            {title.second && (
+              <>
+                <br />
+
+                <em>
+                  {
+                    title.second
+                  }.
+                </em>
+              </>
+            )}
           </h2>
 
           <div className="showcaseLine" />
 
           <p className="showcaseSmallText">
-            Bazı şeyler gece daha kolay söylenir.
+            {product.subtitle ??
+              product.description ??
+              'Özenle hazırlanmış özel bir buket.'}
           </p>
         </motion.div>
 
         <motion.div
           className="showcaseDetail"
           style={{
-            opacity: detailOpacity,
+            opacity:
+              detailOpacity,
             x: detailX,
           }}
         >
-          <span className="showcaseStep">02</span>
+          <span className="showcaseStep">
+            02
+          </span>
 
-          <p>İÇİNDE</p>
+          <p>
+            İÇİNDE
+          </p>
 
           <h3>
-            24
-            <span> kırmızı gül</span>
+            {size?.count ?? '—'}
+
+            <span>
+              {' '}
+              {flowerName.toLocaleLowerCase(
+                'tr-TR',
+              )}
+            </span>
           </h3>
 
           <p className="detailDescription">
-            Tek tek seçilen güller.
+            Özenle seçilen
+            çiçekler.
             <br />
-            Güçlü, zamansız ve doğrudan.
+            Sana özel
+            hazırlanır.
           </p>
         </motion.div>
 
         <motion.div
           className="showcasePackaging"
           style={{
-            opacity: packagingOpacity,
+            opacity:
+              packagingOpacity,
             x: packagingX,
           }}
         >
-          <span className="showcaseStep">03</span>
+          <span className="showcaseStep">
+            03
+          </span>
 
-          <p>SON DOKUNUŞ</p>
+          <p>
+            SON DOKUNUŞ
+          </p>
 
           <h3>
-            Siyah.
+            {wrap?.name ??
+              'Sana özel.'}
+
             <br />
-            <em>Çünkü fazlasına gerek yok.</em>
+
+            <em>
+              Her detay senin
+              seçimin.
+            </em>
           </h3>
 
           <p>
-            Mat siyah premium ambalaj.
+            Premium ambalaj.
             <br />
-            El işçiliği ile hazırlanır.
+            Özenle, el
+            işçiliğiyle
+            hazırlanır.
           </p>
         </motion.div>
 
         <motion.div
           className="showcaseFinal"
           style={{
-            opacity: finalOpacity,
+            opacity:
+              finalOpacity,
             y: finalY,
           }}
         >
           <p className="finalEyebrow">
-            GECE YARISI / 24 KIRMIZI GÜL
+            {product.name.toLocaleUpperCase(
+              'tr-TR',
+            )}
+
+            {size && (
+              <>
+                {' / '}
+                {size.count}{' '}
+                {flowerName.toLocaleUpperCase(
+                  'tr-TR',
+                )}
+              </>
+            )}
           </p>
 
           <h2>
             Bir buket değil.
             <br />
-            <em>Bir an gönder.</em>
+
+            <em>
+              Bir an gönder.
+            </em>
           </h2>
 
           <div className="finalPurchase">
             <div>
-              <small>BAŞLANGIÇ FİYATI</small>
-              <strong>₺2.990</strong>
+              <small>
+                BAŞLANGIÇ FİYATI
+              </small>
+
+              <strong>
+                {price !== null
+                  ? formatPrice(
+                      price,
+                    )
+                  : 'Fiyat için keşfet'}
+              </strong>
             </div>
 
             <button
+              type="button"
               onClick={() => {
-                window.location.href = "/product/gece-yarisi";
+                window.location.href =
+                  `/urunler/${product.slug}`;
               }}
             >
               Hediye Et
-              <span>↗</span>
+
+              <span>
+                ↗
+              </span>
             </button>
           </div>
         </motion.div>
@@ -278,7 +727,8 @@ function ProductShowcase() {
           <motion.div
             className="showcaseProgressInner"
             style={{
-              width: progressWidth,
+              width:
+                progressWidth,
             }}
           />
         </div>
@@ -294,8 +744,22 @@ function ProductShowcase() {
   );
 }
 
+function CollectionSection({
+  collections,
+}: {
+  collections: Collection[];
+}) {
+  const visibleCollections =
+    collections
+      .filter(
+        (collection) =>
+          collection.isActive,
+      )
+      .slice(
+        0,
+        3,
+      );
 
-function CollectionSection() {
   return (
     <section
       className="collectionSection"
@@ -304,172 +768,297 @@ function CollectionSection() {
       <div className="collectionHeader">
         <div>
           <p className="sectionEyebrow">
-            FLOREA KOLEKSİYONLARI
+            Bİ BUKET NEŞE
+            KOLEKSİYONLARI
           </p>
 
           <h2>
             Bir çiçek seçme.
             <br />
-            <span>Bir his seç.</span>
+
+            <span>
+              Bir his seç.
+            </span>
           </h2>
         </div>
 
         <p className="collectionIntro">
-          Her koleksiyon farklı bir duygu için tasarlandı.
-          Bazen yoğun, bazen sakin, bazen de sadece içinden geldiği için.
+          Her koleksiyon farklı
+          bir duygu için
+          hazırlandı. Bazen
+          yoğun, bazen sakin,
+          bazen de sadece
+          içinden geldiği için.
         </p>
       </div>
 
-      <div className="collectionGrid">
-        <motion.a
-          href="/product/gece-yarisi"
-          className="collectionCard collectionCardLarge"
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.8 }}
+      {visibleCollections.length >
+      0 ? (
+        <div className="collectionGrid">
+          {visibleCollections.map(
+            (
+              collection,
+              index,
+            ) => {
+              const product =
+                getCollectionProduct(
+                  collection,
+                );
+
+              const title =
+                splitTitle(
+                  collection.name,
+                );
+
+              const image =
+                collection.image ??
+                product?.heroImage ??
+                null;
+
+              const href =
+                product
+                  ? `/urunler/${product.slug}`
+                  : '#';
+
+              return (
+                <motion.a
+                  key={
+                    collection.id
+                  }
+                  href={href}
+                  className={[
+                    'collectionCard',
+                    index === 0
+                      ? 'collectionCardLarge'
+                      : '',
+                  ]
+                    .filter(
+                      Boolean,
+                    )
+                    .join(' ')}
+                  initial={{
+                    opacity: 0,
+                    y: 60,
+                  }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  viewport={{
+                    once: true,
+                    amount: 0.2,
+                  }}
+                  transition={{
+                    duration: 0.8,
+                    delay:
+                      index *
+                      0.1,
+                  }}
+                >
+                  <div
+                    className="collectionCardImage"
+                    style={
+                      image
+                        ? {
+                            backgroundImage:
+                              `url("${image}")`,
+                            backgroundSize:
+                              'cover',
+                            backgroundPosition:
+                              'center',
+                          }
+                        : undefined
+                    }
+                  />
+
+                  <div className="collectionCardOverlay" />
+
+                  <div className="collectionCardTop">
+                    <span>
+                      {String(
+                        index + 1,
+                      ).padStart(
+                        2,
+                        '0',
+                      )}
+                    </span>
+
+                    <span>
+                      {collection.isFeatured
+                        ? 'ÖNE ÇIKAN KOLEKSİYON'
+                        : 'Bİ BUKET NEŞE'}
+                    </span>
+                  </div>
+
+                  <div className="collectionCardContent">
+                    <p>
+                      {collection.subtitle ??
+                        'ÖZEL KOLEKSİYON'}
+                    </p>
+
+                    <h3>
+                      {
+                        title.first
+                      }
+
+                      {title.second && (
+                        <>
+                          <br />
+
+                          <em>
+                            {
+                              title.second
+                            }.
+                          </em>
+                        </>
+                      )}
+                    </h3>
+
+                    <div className="collectionCardBottom">
+                      <span>
+                        {collection.description ??
+                          product
+                            ?.flowerName ??
+                          product
+                            ?.categories?.[0]
+                            ?.name ??
+                          'Koleksiyonu keşfet'}
+                      </span>
+
+                      <span className="collectionArrow">
+                        ↗
+                      </span>
+                    </div>
+                  </div>
+                </motion.a>
+              );
+            },
+          )}
+        </div>
+      ) : (
+        <div
+          style={{
+            padding:
+              '80px 20px',
+            textAlign:
+              'center',
+            opacity: 0.55,
+          }}
         >
-          <div className="collectionCardImage collectionMidnight" />
-          <div className="collectionCardOverlay" />
-
-          <div className="collectionCardTop">
-            <span>01</span>
-            <span>FLOREA SIGNATURE</span>
-          </div>
-
-          <div className="collectionCardContent">
-            <p>SENİ SEVİYORUM</p>
-
-            <h3>
-              Gece
-              <br />
-              <em>Yarısı.</em>
-            </h3>
-
-            <div className="collectionCardBottom">
-              <span>Kırmızı Güller</span>
-              <span className="collectionArrow">↗</span>
-            </div>
-          </div>
-        </motion.a>
-
-        <motion.a
-          href="/product/sessiz-ozur"
-          className="collectionCard"
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-        >
-          <div className="collectionCardImage collectionSorry" />
-          <div className="collectionCardOverlay" />
-
-          <div className="collectionCardTop">
-            <span>02</span>
-            <span>FLOREA EMOTION</span>
-          </div>
-
-          <div className="collectionCardContent">
-            <p>ÖZÜR DİLERİM</p>
-
-            <h3>
-              Sessiz
-              <br />
-              <em>Özür.</em>
-            </h3>
-
-            <div className="collectionCardBottom">
-              <span>Beyaz &amp; Pudra</span>
-              <span className="collectionArrow">↗</span>
-            </div>
-          </div>
-        </motion.a>
-
-        <motion.a
-          href="/product/ilk-gun"
-          className="collectionCard"
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <div className="collectionCardImage collectionFirstDay" />
-          <div className="collectionCardOverlay" />
-
-          <div className="collectionCardTop">
-            <span>03</span>
-            <span>FLOREA MOMENTS</span>
-          </div>
-
-          <div className="collectionCardContent">
-            <p>İYİ Kİ DOĞDUN</p>
-
-            <h3>
-              İlk
-              <br />
-              <em>Gün.</em>
-            </h3>
-
-            <div className="collectionCardBottom">
-              <span>Mevsim Çiçekleri</span>
-              <span className="collectionArrow">↗</span>
-            </div>
-          </div>
-        </motion.a>
-      </div>
+          Henüz aktif bir
+          koleksiyon
+          bulunmuyor.
+        </div>
+      )}
 
       <div className="collectionFooter">
-        <p>Yeni koleksiyonlar yakında.</p>
+        <p>
+          Yeni koleksiyonlar
+          yakında.
+        </p>
 
         <a href="#create">
-          Kendi buketini oluştur →
+          Kendi buketini
+          oluştur →
         </a>
       </div>
     </section>
   );
 }
 
-function CreateTeaser() {
+function CreateTeaser({
+  product,
+}: {
+  product: Product | null;
+}) {
+  const href =
+    product
+      ? `/urunler/${product.slug}`
+      : '#collections';
+
   return (
     <section
       className="createTeaser"
       id="create"
     >
-      <div className="createTeaserImage">
+      <div
+        className="createTeaserImage"
+        style={
+          product?.heroImage
+            ? {
+                backgroundImage:
+                  `url("${product.heroImage}")`,
+                backgroundSize:
+                  'cover',
+                backgroundPosition:
+                  'center',
+              }
+            : undefined
+        }
+      >
         <div className="createTeaserOverlay" />
 
         <motion.div
           className="createTeaserContent"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 0.85 }}
+          initial={{
+            opacity: 0,
+            y: 50,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.35,
+          }}
+          transition={{
+            duration: 0.85,
+          }}
         >
-          <p>SENİN ÇİÇEĞİN</p>
+          <p>
+            SENİN ÇİÇEĞİN
+          </p>
 
           <h2>
-            Hazır bir buket seçme.
+            Hazır bir buket
+            seçme.
             <br />
-            <span>Onu kendin yarat.</span>
+
+            <span>
+              Onu kendin yarat.
+            </span>
           </h2>
 
           <p className="createTeaserDescription">
-            Çiçek sayısından ambalaja, karttan mesajına kadar
-            her detayı kendin belirle.
+            Çiçek sayısından
+            ambalaja, karttan
+            mesajına kadar her
+            detayı kendin
+            belirle.
           </p>
 
           <a
-            href="/product/gece-yarisi"
+            href={href}
             className="createTeaserButton"
           >
             Buketini Oluştur
-            <span>↗</span>
+
+            <span>
+              ↗
+            </span>
           </a>
         </motion.div>
 
         <div className="createTeaserBottom">
-          <span>FLOREA CUSTOM</span>
-          <span>SENİN HİKÂYEN</span>
+          <span>
+            Bİ BUKET NEŞE /
+            SANA ÖZEL
+          </span>
+
+          <span>
+            SENİN HİKÂYEN
+          </span>
         </div>
       </div>
     </section>
@@ -477,71 +1066,147 @@ function CreateTeaser() {
 }
 
 export default function Home() {
-  const {
-    itemCount,
-    openCart,
-  } = useCart();
+  const [
+    products,
+    setProducts,
+  ] = useState<Product[]>(
+    [],
+  );
+
+  const [
+    collections,
+    setCollections,
+  ] = useState<
+    Collection[]
+  >([]);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    apiError,
+    setApiError,
+  ] = useState('');
+
+  useEffect(() => {
+    async function loadHome() {
+      try {
+        setLoading(true);
+        setApiError('');
+
+        const [
+          productResponse,
+          collectionResponse,
+        ] =
+          await Promise.all([
+            fetch(
+              `${API_URL}/products`,
+              {
+                cache:
+                  'no-store',
+              },
+            ),
+
+            fetch(
+              `${API_URL}/collections`,
+              {
+                cache:
+                  'no-store',
+              },
+            ),
+          ]);
+
+        if (
+          !productResponse.ok
+        ) {
+          throw new Error(
+            'Ürünler alınamadı.',
+          );
+        }
+
+        if (
+          !collectionResponse.ok
+        ) {
+          throw new Error(
+            'Koleksiyonlar alınamadı.',
+          );
+        }
+
+        const productData =
+          (await productResponse.json()) as Product[];
+
+        const collectionData =
+          (await collectionResponse.json()) as Collection[];
+
+        setProducts(
+          productData.filter(
+            (product) =>
+              product.isActive,
+          ),
+        );
+
+        setCollections(
+          collectionData
+            .filter(
+              (collection) =>
+                collection.isActive,
+            )
+            .sort(
+              (a, b) =>
+                a.sortOrder -
+                b.sortOrder,
+            ),
+        );
+      } catch (error) {
+        console.error(
+          'Ana sayfa verileri alınamadı:',
+          error,
+        );
+
+        setApiError(
+          error instanceof Error
+            ? error.message
+            : 'Ana sayfa verileri alınamadı.',
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadHome();
+  }, []);
+
+  const featuredProduct =
+    useMemo(() => {
+      return (
+        products.find(
+          (product) =>
+            product.isFeatured,
+        ) ??
+        products[0] ??
+        null
+      );
+    }, [products]);
+
+  const moodCollections =
+    useMemo(
+      () =>
+        collections.slice(
+          0,
+          4,
+        ),
+      [collections],
+    );
 
   return (
     <main className="site">
       {/* HERO */}
       <section className="hero">
         <div className="heroImage" />
+
         <div className="heroOverlay" />
-
-        <header className="navbar">
-          <motion.a
-            href="#"
-            className="logo"
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            FLOREA
-          </motion.a>
-
-          <motion.nav
-            className="navLinks"
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.8,
-              delay: 0.15,
-            }}
-          >
-            <a href="#collections">
-              Koleksiyonlar
-            </a>
-
-            <a href="#moods">
-              Duygular
-            </a>
-
-            <a href="#create">
-              Buketini Oluştur
-            </a>
-          </motion.nav>
-
-          <motion.div
-            className="navActions"
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.8,
-              delay: 0.25,
-            }}
-          >
-            <button>Ara</button>
-
-            <button
-              className="cartButton"
-              onClick={openCart}
-            >
-              Sepet
-              <span>{itemCount}</span>
-            </button>
-          </motion.div>
-        </header>
 
         <div className="heroContent">
           <motion.p
@@ -558,9 +1223,7 @@ export default function Home() {
               duration: 0.8,
               delay: 0.3,
             }}
-          >
-            ÇİÇEKTEN DAHA FAZLASI
-          </motion.p>
+          />
 
           <motion.h1
             initial={{
@@ -576,11 +1239,13 @@ export default function Home() {
               delay: 0.45,
             }}
           >
-            Çiçek göndermiyorsun.
+            Bir buket
+            göndermiyorsun.
             <br />
 
             <span>
-              Bir şey söylüyorsun.
+              Bir neşe
+              gönderiyorsun.
             </span>
           </motion.h1>
 
@@ -599,9 +1264,15 @@ export default function Home() {
               delay: 0.65,
             }}
           >
-            Bazı duygular kelimelerden daha fazlasını hak eder.
+            Bazı duygular
+            kelimelerden daha
+            fazlasını hak eder.
             <br />
-            Onları senin için çiçeğe dönüştürüyoruz.
+            Biz onları
+            çiçeklere,
+            renklere ve
+            unutulmaz anlara
+            dönüştürüyoruz.
           </motion.p>
 
           <motion.div
@@ -624,7 +1295,10 @@ export default function Home() {
               className="primaryButton"
             >
               Duygunu Seç
-              <span>↗</span>
+
+              <span>
+                ↗
+              </span>
             </a>
 
             <a
@@ -638,8 +1312,12 @@ export default function Home() {
 
         <motion.div
           className="heroBottom"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{
+            opacity: 0,
+          }}
+          animate={{
+            opacity: 1,
+          }}
           transition={{
             duration: 1,
             delay: 1.2,
@@ -647,17 +1325,29 @@ export default function Home() {
         >
           <div className="scrollIndicator">
             <span />
-            Keşfetmek için kaydır
+            Keşfetmek için
+            kaydır
           </div>
 
-          <div className="heroProduct">
-            <span>01</span>
+          {featuredProduct && (
+            <div className="heroProduct">
+              <span>
+                01
+              </span>
 
-            <div>
-              <small>ÖNE ÇIKAN</small>
-              <strong>Gece Yarısı</strong>
+              <div>
+                <small>
+                  ÖNE ÇIKAN
+                </small>
+
+                <strong>
+                  {
+                    featuredProduct.name
+                  }
+                </strong>
+              </div>
             </div>
-          </div>
+          )}
         </motion.div>
       </section>
 
@@ -667,26 +1357,61 @@ export default function Home() {
         id="collection"
       >
         <p className="sectionEyebrow">
-          FLOREA SEÇKİSİ
+          Bİ BUKET NEŞE
+          SEÇKİSİ
         </p>
 
         <h2>
           Her çiçeğin
           <br />
+
           <span>
-            anlatacak bir şeyi var.
+            anlatacak bir
+            şeyi var.
           </span>
         </h2>
 
         <p className="introText">
-          Aşk, özür, kutlama ya da sadece içinden geldiği için.
-          Florea&apos;da önce duygunu seçersin,
-          sonra çiçeğini.
+          Aşk, özür, kutlama
+          ya da sadece
+          içinden geldiği
+          için. Bi Buket
+          Neşe&apos;de önce
+          duygunu seç, sonra
+          o duyguyu anlatacak
+          çiçeği.
         </p>
       </section>
 
+      {/* API DURUMU */}
+      {apiError && (
+        <div
+          style={{
+            maxWidth:
+              '1200px',
+            margin:
+              '0 auto 40px',
+            padding:
+              '16px 20px',
+            textAlign:
+              'center',
+            opacity: 0.65,
+            fontSize:
+              '13px',
+          }}
+        >
+          {apiError}
+        </div>
+      )}
+
       {/* COLLECTIONS */}
-      <CollectionSection />
+      {!loading && (
+        <CollectionSection
+          collections={
+            collections
+          }
+        />
+      )}
 
       {/* MOODS */}
       <section
@@ -696,7 +1421,8 @@ export default function Home() {
         <div className="moodSticky">
           <div className="moodLeft">
             <p className="sectionEyebrow">
-              BUGÜN NE SÖYLEMEK İSTİYORSUN?
+              BUGÜN NE SÖYLEMEK
+              İSTİYORSUN?
             </p>
 
             <h2>
@@ -704,109 +1430,211 @@ export default function Home() {
               <br />
 
               <span>
-                Gerisini çiçekler anlatsın.
+                Gerisini
+                çiçekler
+                anlatsın.
               </span>
             </h2>
 
             <p className="moodDescription">
-              Klasik kategoriler yerine,
-              hissettiğin şeyden başla.
-              Florea senin için doğru buketi bulsun.
+              Klasik
+              kategoriler
+              yerine,
+              hissettiğin
+              şeyden başla.
+              Bi Buket Neşe
+              senin için
+              doğru buketi
+              bulsun.
             </p>
           </div>
 
           <div className="moodVisual">
-            <div className="moodFlower" />
+            <div
+              className="moodFlower"
+              style={
+                featuredProduct
+                  ?.heroImage
+                  ? {
+                      backgroundImage:
+                        `url("${featuredProduct.heroImage}")`,
+                      backgroundSize:
+                        'cover',
+                      backgroundPosition:
+                        'center',
+                    }
+                  : undefined
+              }
+            />
 
             <div className="moodVisualText">
               <small>
-                FLOREA SIGNATURE
+                Bİ BUKET NEŞE
               </small>
 
               <strong>
-                Bir his. Bir buket. Bir an.
+                Bir his. Bir
+                buket. Bir an.
               </strong>
             </div>
           </div>
         </div>
 
         <div className="moodCards">
-          {moods.map((item, index) => (
-            <motion.article
-              key={item.title}
-              className="moodCard"
-              initial={{
-                opacity: 0,
-                y: 50,
-              }}
-              whileInView={{
-                opacity: 1,
-                y: 0,
-              }}
-              viewport={{
-                once: true,
-                amount: 0.35,
-              }}
-              transition={{
-                duration: 0.7,
-                delay: index * 0.08,
-              }}
-            >
-              <span className="moodNumber">
-                {String(index + 1).padStart(
-                  2,
-                  "0"
-                )}
-              </span>
+          {moodCollections.map(
+            (
+              collection,
+              index,
+            ) => {
+              const product =
+                getCollectionProduct(
+                  collection,
+                );
 
-              <div>
-                <h3>
-                  {item.title}
-                </h3>
+              return (
+                <motion.article
+                  key={
+                    collection.id
+                  }
+                  className="moodCard"
+                  initial={{
+                    opacity: 0,
+                    y: 50,
+                  }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  viewport={{
+                    once: true,
+                    amount: 0.35,
+                  }}
+                  transition={{
+                    duration: 0.7,
+                    delay:
+                      index *
+                      0.08,
+                  }}
+                >
+                  <span className="moodNumber">
+                    {String(
+                      index + 1,
+                    ).padStart(
+                      2,
+                      '0',
+                    )}
+                  </span>
 
-                <p>
-                  {item.text}
-                </p>
+                  <div>
+                    <h3>
+                      {
+                        collection.name
+                      }
+                    </h3>
+
+                    <p>
+                      {collection.subtitle ??
+                        collection.description ??
+                        'Bu duyguya özel seçilen buketleri keşfet.'}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={
+                      !product
+                    }
+                    onClick={() => {
+                      if (
+                        product
+                      ) {
+                        window.location.href =
+                          `/urunler/${product.slug}`;
+                      }
+                    }}
+                  >
+                    Keşfet ↗
+                  </button>
+                </motion.article>
+              );
+            },
+          )}
+
+          {!loading &&
+            moodCollections.length ===
+              0 && (
+              <div
+                style={{
+                  padding:
+                    '50px 0',
+                  opacity:
+                    0.55,
+                }}
+              >
+                Henüz
+                koleksiyon
+                eklenmedi.
               </div>
-
-              <button>
-                Keşfet ↗
-              </button>
-            </motion.article>
-          ))}
+            )}
         </div>
       </section>
 
-      {/* ASIL APPLE TARZI SCROLL ALANI */}
-      <ProductShowcase />
+      {/* APPLE TARZI SCROLL ÜRÜN ALANI */}
+      {!loading && (
+        <ProductShowcase
+          product={
+            featuredProduct
+          }
+        />
+      )}
 
-      <CreateTeaser />
+      {/* KENDİ BUKETİNİ OLUŞTUR */}
+      {!loading && (
+        <CreateTeaser
+          product={
+            featuredProduct
+          }
+        />
+      )}
 
       {/* STORY */}
       <section className="storySection">
         <div className="storyImage" />
+
         <div className="storyOverlay" />
 
         <div className="storyContent">
-          <p>FLOREA / 02</p>
+          <p>
+            Bİ BUKET NEŞE /
+            HİKÂYEMİZ
+          </p>
 
           <h2>
             Bazı anlar
             <br />
 
             <span>
-              unutulmak için fazla güzel.
+              unutulmak için
+              fazla güzel.
             </span>
           </h2>
 
           <p className="storyText">
-            Her buket yalnızca çiçeklerden oluşmaz.
-            Bazen bir özür, bazen bir başlangıç,
-            bazen de uzun zamandır söylenemeyen tek bir cümledir.
+            Her buket yalnızca
+            çiçeklerden
+            oluşmaz. Bazen bir
+            özür, bazen bir
+            başlangıç, bazen
+            doğum günü neşesi,
+            bazen de uzun
+            zamandır
+            söylenemeyen tek
+            bir cümledir.
           </p>
 
           <a href="#create">
-            Kendi buketini yarat →
+            Kendi buketini
+            yarat →
           </a>
         </div>
       </section>
