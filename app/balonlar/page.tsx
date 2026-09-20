@@ -514,6 +514,40 @@ export default function BalloonsPage() {
             daha renk, biraz
             daha neşe.
           </span>
+
+          {/* KENDİ BALON BUKETİNİ OLUŞTUR */}
+          <motion.a
+            href="/create-balloon"
+            className="createBalloonButton"
+            initial={{
+              opacity: 0,
+              y: 15,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.5,
+              delay: 0.3,
+            }}
+            whileHover={{
+              y: -3,
+              scale: 1.02,
+            }}
+            whileTap={{
+              scale: 0.98,
+            }}
+          >
+            <span>
+              Kendi Balon Buketini
+              Oluştur
+            </span>
+
+            <strong>
+              →
+            </strong>
+          </motion.a>
         </motion.div>
       </section>
 
@@ -960,6 +994,99 @@ export default function BalloonsPage() {
             )}
         </div>
       </section>
+
+      {/* SADECE BU SAYFADAKİ CREATE BALLOON BUTONU */}
+      <style jsx global>{`
+        .createBalloonButton {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+
+          width: fit-content;
+
+          margin-top: 28px;
+          padding: 16px 25px;
+
+          border: 1px solid #351f28;
+          border-radius: 999px;
+
+          background: #351f28;
+          color: #ffffff;
+
+          text-decoration: none;
+
+          cursor: pointer;
+
+          box-shadow:
+            0 12px 35px
+            rgba(53, 31, 40, 0.12);
+
+          transition:
+            background 0.25s ease,
+            color 0.25s ease,
+            box-shadow 0.25s ease;
+        }
+
+        .createBalloonButton > span {
+          color: inherit !important;
+
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          line-height: 1 !important;
+          letter-spacing: 0.04em !important;
+        }
+
+        .createBalloonButton > strong {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          color: inherit;
+
+          font-size: 20px;
+          font-weight: 400;
+          line-height: 1;
+
+          transition:
+            transform 0.25s ease;
+        }
+
+        .createBalloonButton:hover {
+          background: #ffffff;
+          color: #351f28;
+
+          box-shadow:
+            0 16px 40px
+            rgba(53, 31, 40, 0.16);
+        }
+
+        .createBalloonButton:hover
+        > strong {
+          transform:
+            translateX(5px);
+        }
+
+        @media (
+          max-width: 768px
+        ) {
+          .createBalloonButton {
+            width: 100%;
+            max-width: 310px;
+
+            margin-top: 22px;
+            padding: 15px 20px;
+
+            gap: 15px;
+          }
+
+          .createBalloonButton
+          > span {
+            font-size:
+              12px !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
