@@ -35,6 +35,12 @@ type ProductCategory = {
   slug: string;
 };
 
+type Category = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 type Product = {
   id: string;
   slug: string;
@@ -224,6 +230,254 @@ function getCollectionProduct(
     )?.product ??
     products[0]?.product ??
     null
+  );
+}
+
+function CategoryCircles({
+  categories,
+  products,
+}: {
+  categories: Category[];
+  products: Product[];
+}) {
+  if (categories.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="homeCategories" id="categories">
+      <div className="homeCategoriesHeading">
+        <p className="sectionEyebrow">KATEGORİLER</p>
+
+        <h2>
+          Ne göndermek
+          <br />
+          <span>istiyorsun?</span>
+        </h2>
+
+        <p>
+          Aradığın çiçeğe daha hızlı ulaş. Kategorini seç,
+          sana özel buketleri keşfet.
+        </p>
+      </div>
+
+      <div className="homeCategoryScroller">
+        {categories.map((category, index) => {
+          const categoryProduct = products.find((product) =>
+            product.categories?.some(
+              (item) => item.id === category.id || item.slug === category.slug,
+            ),
+          );
+
+          const image = categoryProduct?.heroImage ?? null;
+
+          return (
+            <motion.a
+              key={category.id}
+              href={`/urunler?kategori=${encodeURIComponent(category.slug)}`}
+              className="homeCategoryItem"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.55, delay: index * 0.05 }}
+            >
+              <div className="homeCategoryCircle">
+                {image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={image} alt={category.name} />
+                ) : (
+                  <div className="homeCategoryFallback">
+                    <span>{category.name.charAt(0).toLocaleUpperCase('tr-TR')}</span>
+                  </div>
+                )}
+
+                <div className="homeCategoryCircleShade" />
+              </div>
+
+              <strong>{category.name}</strong>
+              <span className="homeCategoryExplore">Keşfet →</span>
+            </motion.a>
+          );
+        })}
+      </div>
+
+      <style jsx>{`
+        .homeCategories {
+          padding: 110px 5vw 105px;
+          background: #fffaf7;
+          overflow: hidden;
+        }
+
+        .homeCategoriesHeading {
+          width: min(1320px, 100%);
+          margin: 0 auto 54px;
+          display: grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          align-items: end;
+          gap: 40px;
+        }
+
+        .homeCategoriesHeading .sectionEyebrow {
+          grid-column: 1 / -1;
+          margin: 0 0 -18px;
+          font-size: 11px;
+          letter-spacing: 0.2em;
+          font-weight: 700;
+        }
+
+        .homeCategoriesHeading h2 {
+          margin: 0;
+          font-size: clamp(42px, 5.4vw, 78px);
+          line-height: 0.94;
+          letter-spacing: -0.055em;
+          font-weight: 500;
+        }
+
+        .homeCategoriesHeading h2 span {
+          font-family: Georgia, 'Times New Roman', serif;
+          font-style: italic;
+          font-weight: 400;
+        }
+
+        .homeCategoriesHeading > p:last-child {
+          max-width: 440px;
+          margin: 0 0 5px auto;
+          font-size: 15px;
+          line-height: 1.8;
+          opacity: 0.65;
+        }
+
+        .homeCategoryScroller {
+          width: min(1420px, 100%);
+          margin: 0 auto;
+          display: flex;
+          gap: clamp(20px, 2.3vw, 38px);
+          overflow-x: auto;
+          padding: 6px 2px 20px;
+          scrollbar-width: none;
+          scroll-snap-type: x proximity;
+        }
+
+        .homeCategoryScroller::-webkit-scrollbar {
+          display: none;
+        }
+
+        :global(.homeCategoryItem) {
+          flex: 0 0 clamp(142px, 14vw, 205px);
+          color: inherit;
+          text-decoration: none;
+          text-align: center;
+          scroll-snap-align: start;
+        }
+
+        .homeCategoryCircle {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 1;
+          overflow: hidden;
+          border-radius: 999px;
+          background: #eadfd8;
+          box-shadow: 0 18px 45px rgba(46, 31, 24, 0.09);
+          transition: transform 0.45s ease, box-shadow 0.45s ease;
+        }
+
+        :global(.homeCategoryItem:hover) .homeCategoryCircle {
+          transform: translateY(-7px) scale(1.015);
+          box-shadow: 0 26px 58px rgba(46, 31, 24, 0.15);
+        }
+
+        .homeCategoryCircle img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.65s ease;
+        }
+
+        :global(.homeCategoryItem:hover) .homeCategoryCircle img {
+          transform: scale(1.07);
+        }
+
+        .homeCategoryCircleShade {
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          box-shadow: inset 0 0 0 1px rgba(50, 34, 28, 0.08);
+          pointer-events: none;
+        }
+
+        .homeCategoryFallback {
+          width: 100%;
+          height: 100%;
+          display: grid;
+          place-items: center;
+          background: linear-gradient(145deg, #efe2dc, #d7b9ad);
+        }
+
+        .homeCategoryFallback span {
+          font-family: Georgia, 'Times New Roman', serif;
+          font-size: 56px;
+          font-style: italic;
+          opacity: 0.55;
+        }
+
+        :global(.homeCategoryItem > strong) {
+          display: block;
+          margin-top: 20px;
+          font-size: 15px;
+          font-weight: 600;
+          letter-spacing: -0.01em;
+        }
+
+        :global(.homeCategoryExplore) {
+          display: block;
+          margin-top: 7px;
+          font-size: 10px;
+          letter-spacing: 0.13em;
+          text-transform: uppercase;
+          opacity: 0.48;
+          transition: opacity 0.25s ease;
+        }
+
+        :global(.homeCategoryItem:hover .homeCategoryExplore) {
+          opacity: 0.9;
+        }
+
+        @media (max-width: 760px) {
+          .homeCategories {
+            padding: 76px 20px 68px;
+          }
+
+          .homeCategoriesHeading {
+            display: block;
+            margin-bottom: 38px;
+          }
+
+          .homeCategoriesHeading .sectionEyebrow {
+            margin-bottom: 18px;
+          }
+
+          .homeCategoriesHeading > p:last-child {
+            margin: 24px 0 0;
+            max-width: 520px;
+          }
+
+          .homeCategoryScroller {
+            width: calc(100% + 20px);
+            gap: 18px;
+            padding-right: 20px;
+          }
+
+          :global(.homeCategoryItem) {
+            flex-basis: 128px;
+          }
+
+          :global(.homeCategoryItem > strong) {
+            margin-top: 14px;
+            font-size: 14px;
+          }
+        }
+      `}</style>
+    </section>
   );
 }
 
@@ -1081,6 +1335,11 @@ export default function Home() {
   >([]);
 
   const [
+    categories,
+    setCategories,
+  ] = useState<Category[]>([]);
+
+  const [
     loading,
     setLoading,
   ] = useState(true);
@@ -1099,6 +1358,7 @@ export default function Home() {
         const [
           productResponse,
           collectionResponse,
+          categoryResponse,
         ] =
           await Promise.all([
             fetch(
@@ -1111,6 +1371,14 @@ export default function Home() {
 
             fetch(
               `${API_URL}/collections`,
+              {
+                cache:
+                  'no-store',
+              },
+            ),
+
+            fetch(
+              `${API_URL}/categories`,
               {
                 cache:
                   'no-store',
@@ -1134,11 +1402,22 @@ export default function Home() {
           );
         }
 
+        if (
+          !categoryResponse.ok
+        ) {
+          throw new Error(
+            'Kategoriler alınamadı.',
+          );
+        }
+
         const productData =
           (await productResponse.json()) as Product[];
 
         const collectionData =
           (await collectionResponse.json()) as Collection[];
+
+        const categoryData =
+          (await categoryResponse.json()) as Category[];
 
         setProducts(
           productData.filter(
@@ -1159,6 +1438,8 @@ export default function Home() {
                 b.sortOrder,
             ),
         );
+
+        setCategories(categoryData);
       } catch (error) {
         console.error(
           'Ana sayfa verileri alınamadı:',
@@ -1350,6 +1631,14 @@ export default function Home() {
           )}
         </motion.div>
       </section>
+
+      {/* LILYANA TARZI YUVARLAK KATEGORİLER */}
+      {!loading && (
+        <CategoryCircles
+          categories={categories}
+          products={products}
+        />
+      )}
 
       {/* INTRO */}
       <section
