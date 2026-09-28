@@ -39,6 +39,9 @@ type Category = {
   id: string;
   name: string;
   slug: string;
+  image?: string | null;
+  heroImage?: string | null;
+  imageUrl?: string | null;
   isActive?: boolean;
   sortOrder?: number;
 };
@@ -1094,6 +1097,18 @@ function CategoryCircles({
           const product = products.find((item) =>
             item.categories?.some((itemCategory) => itemCategory.id === category.id || itemCategory.slug === category.slug),
           );
+
+           const rawCategoryImage =
+             category.image ??
+             category.heroImage ??
+             category.imageUrl ??
+             product?.heroImage ??
+             null;
+
+           const categoryImage =
+             rawCategoryImage && rawCategoryImage.startsWith('/')
+               ? `${API_URL}${rawCategoryImage}`
+               : rawCategoryImage;
           return (
             <motion.a
               key={category.id}
@@ -1105,9 +1120,9 @@ function CategoryCircles({
               transition={{ duration: 0.45, delay: index * 0.04 }}
             >
               <span className="categoryCircleImage">
-                {product?.heroImage ? (
+                {categoryImage ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.heroImage} alt={category.name} />
+                  <img src={categoryImage} alt={category.name} />
                 ) : (
                   <span className="categoryCircleFallback">✿</span>
                 )}
