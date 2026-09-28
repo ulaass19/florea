@@ -1087,10 +1087,10 @@ button {
   position: relative;
 
   /*
-    Bu alan 500vh olduğu için kullanıcı yaklaşık
-    5 ekran boyunca scroll yapıyor.
+    Bu alan 500vh olduÄŸu iÃ§in kullanÄ±cÄ± yaklaÅŸÄ±k
+    5 ekran boyunca scroll yapÄ±yor.
 
-    İçindeki productSticky ise ekrana yapışık kalıyor.
+    Ä°Ã§indeki productSticky ise ekrana yapÄ±ÅŸÄ±k kalÄ±yor.
   */
   height: 500vh;
 
@@ -1152,7 +1152,7 @@ button {
   z-index: 2;
 }
 
-/* Üst bilgi */
+/* Ãœst bilgi */
 
 .showcaseTop {
   position: absolute;
@@ -1214,7 +1214,7 @@ button {
 }
 
 /*
-  Hafif ışık halesi.
+  Hafif Ä±ÅŸÄ±k halesi.
 */
 
 .showcaseFlowerGlow {
@@ -2147,7 +2147,7 @@ button {
 }
 
 /* =========================================================
-   PRODUCT DETAIL PAGE — COMPACT E-COMMERCE
+   PRODUCT DETAIL PAGE â€” COMPACT E-COMMERCE
 ========================================================= */
 .productPage{min-height:100vh;background:#fff;color:#211a17}
 .productNotFound{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#fff;color:#211a17}
@@ -3121,7 +3121,7 @@ button {
 }
 
 .cartItemDetails span:not(:last-child)::after {
-  content: "·";
+  content: "Â·";
 
   margin-left: 11px;
 }
@@ -9589,3 +9589,14 @@ a.contactInfoCard:hover {
     min-height: 320px;
   }
 }
+
+/* =========================================================
+   FLOREA / LILYANA-INSPIRED HOME COMMERCE LAYER
+   ========================================================= */
+.shopCategories,.commerceProducts{max-width:1440px;margin:0 auto;padding:76px 5vw;background:#fff}.shopSectionHeading{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-bottom:34px}.shopSectionHeadingCentered{display:block;text-align:center;margin-bottom:38px}.shopSectionHeading span{display:block;color:var(--wine);font-size:11px;font-weight:800;letter-spacing:.18em;margin-bottom:10px}.shopSectionHeading h2{margin:0;color:#201a16;font-family:Georgia,'Times New Roman',serif;font-size:clamp(30px,3vw,48px);font-weight:500;line-height:1.05}.shopSectionHeading p{color:#766a6d;font-size:14px;margin:12px auto 0;max-width:560px}.shopSectionHeading>a{color:var(--wine);text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap;padding-bottom:5px;border-bottom:1px solid rgba(141,38,61,.25)}
+.categoryCircleRow{display:flex;justify-content:center;gap:26px;overflow-x:auto;padding:8px 4px 16px;scrollbar-width:none}.categoryCircleRow::-webkit-scrollbar{display:none}.categoryCircleItem{flex:0 0 126px;text-align:center;text-decoration:none;color:#201a16}.categoryCircleImage{width:118px;height:118px;display:block;border-radius:50%;padding:5px;margin:0 auto 13px;background:#f7ecee;border:1px solid #ead8dc;transition:.3s ease}.categoryCircleImage img{width:100%;height:100%;display:block;object-fit:cover;border-radius:50%;transition:.35s ease}.categoryCircleItem:hover .categoryCircleImage{transform:translateY(-4px);box-shadow:0 12px 30px rgba(76,25,39,.12);border-color:#cfaab3}.categoryCircleItem:hover img{transform:scale(1.045)}.categoryCircleFallback{width:100%;height:100%;display:grid;place-items:center;border-radius:50%;font-size:34px;color:var(--wine);background:#f8edef}.categoryCircleItem strong{display:block;font-size:13px;font-weight:700}.categoryCircleItem small{display:block;margin-top:4px;color:#9c8e91;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.trustStrip{max-width:1440px;margin:0 auto 30px;padding:22px 5vw;display:grid;grid-template-columns:repeat(4,1fr);background:#f8f2f1;border-top:1px solid #eee0e2;border-bottom:1px solid #eee0e2}.trustStrip>div{display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 18px;border-right:1px solid #e7d9dc}.trustStrip>div:last-child{border-right:0}.trustStrip b{font-size:21px;color:var(--wine);font-weight:400}.trustStrip span{display:flex;flex-direction:column}.trustStrip strong{font-size:12px;color:#3b2c30}.trustStrip small{font-size:10px;color:#8b7d80;margin-top:3px}
+.commerceProducts{padding-top:62px;padding-bottom:84px}.commerceProductGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:34px 18px}.commerceProductCard{text-decoration:none;color:#201a16;min-width:0}.commerceProductImage{position:relative;aspect-ratio:1/1.12;overflow:hidden;background:#f6f1f0;border-radius:2px}.commerceProductImage img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}.commerceProductCard:hover .commerceProductImage img{transform:scale(1.035)}.productBadge{position:absolute;top:12px;left:12px;background:var(--wine);color:#fff;font-size:9px;font-weight:800;letter-spacing:.1em;padding:7px 9px}.productHeart{position:absolute;right:12px;top:12px;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.9);font-size:18px;color:var(--wine)}.commerceProductInfo{padding:15px 2px 0}.commerceProductInfo>small{color:#9a858a;text-transform:uppercase;letter-spacing:.11em;font-size:9px}.commerceProductInfo h3{font-size:15px;line-height:1.35;margin:7px 0 6px;font-weight:650}.commerceProductInfo p{font-size:11px;color:#8b7d80;line-height:1.45;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.commerceProductBottom{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid #eee6e7}.commerceProductBottom strong{font-size:15px;color:var(--wine)}.commerceProductBottom span{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6d5d61}
+.commerceBanners{max-width:1440px;margin:0 auto;padding:0 5vw 88px;display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.commerceBanner{position:relative;min-height:430px;overflow:hidden;text-decoration:none;color:#fff;background:#5f2735}.commerceBannerImage,.commerceBannerShade{position:absolute;inset:0}.commerceBannerImage{background-size:cover;background-position:center;transition:transform .6s ease}.commerceBannerShade{background:linear-gradient(180deg,rgba(30,11,17,.04),rgba(30,11,17,.68))}.commerceBanner:hover .commerceBannerImage{transform:scale(1.035)}.commerceBannerContent{position:absolute;z-index:2;left:34px;right:34px;bottom:34px}.commerceBannerContent span{font-size:9px;font-weight:800;letter-spacing:.16em}.commerceBannerContent h3{font-family:Georgia,'Times New Roman',serif;font-size:38px;font-weight:500;margin:9px 0}.commerceBannerContent p{font-size:12px;max-width:390px;line-height:1.55;opacity:.86}.commerceBannerContent b{display:inline-block;margin-top:12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+@media(max-width:980px){.commerceProductGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.trustStrip{grid-template-columns:repeat(2,1fr)}.trustStrip>div:nth-child(2){border-right:0}.commerceBanners{grid-template-columns:1fr}.commerceBanner{min-height:360px}.categoryCircleRow{justify-content:flex-start}.shopCategories,.commerceProducts{padding-left:24px;padding-right:24px}.commerceBanners{padding-left:24px;padding-right:24px}}
+@media(max-width:600px){.shopCategories{padding-top:48px;padding-bottom:44px}.shopSectionHeading{align-items:flex-start}.shopSectionHeading h2{font-size:31px}.categoryCircleRow{gap:14px;margin-right:-24px;padding-right:24px}.categoryCircleItem{flex-basis:92px}.categoryCircleImage{width:86px;height:86px}.trustStrip{margin-bottom:10px;padding:15px 14px;grid-template-columns:1fr 1fr}.trustStrip>div{justify-content:flex-start;padding:9px 7px}.trustStrip strong{font-size:10px}.trustStrip small{font-size:8px}.commerceProducts{padding-top:44px;padding-bottom:60px}.commerceProductGrid{gap:25px 10px}.commerceProductInfo h3{font-size:13px}.commerceProductBottom{align-items:flex-start;flex-direction:column;gap:5px}.commerceProductBottom strong{font-size:14px}.commerceBanners{padding-bottom:60px;gap:12px}.commerceBanner{min-height:310px}.commerceBannerContent{left:22px;right:22px;bottom:24px}.commerceBannerContent h3{font-size:31px}}
