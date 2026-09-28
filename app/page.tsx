@@ -39,6 +39,8 @@ type Category = {
   id: string;
   name: string;
   slug: string;
+  isActive?: boolean;
+  sortOrder?: number;
 };
 
 type Product = {
@@ -230,254 +232,6 @@ function getCollectionProduct(
     )?.product ??
     products[0]?.product ??
     null
-  );
-}
-
-function CategoryCircles({
-  categories,
-  products,
-}: {
-  categories: Category[];
-  products: Product[];
-}) {
-  if (categories.length === 0) {
-    return null;
-  }
-
-  return (
-    <section className="homeCategories" id="categories">
-      <div className="homeCategoriesHeading">
-        <p className="sectionEyebrow">KATEGORİLER</p>
-
-        <h2>
-          Ne göndermek
-          <br />
-          <span>istiyorsun?</span>
-        </h2>
-
-        <p>
-          Aradığın çiçeğe daha hızlı ulaş. Kategorini seç,
-          sana özel buketleri keşfet.
-        </p>
-      </div>
-
-      <div className="homeCategoryScroller">
-        {categories.map((category, index) => {
-          const categoryProduct = products.find((product) =>
-            product.categories?.some(
-              (item) => item.id === category.id || item.slug === category.slug,
-            ),
-          );
-
-          const image = categoryProduct?.heroImage ?? null;
-
-          return (
-            <motion.a
-              key={category.id}
-              href={`/urunler?kategori=${encodeURIComponent(category.slug)}`}
-              className="homeCategoryItem"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.55, delay: index * 0.05 }}
-            >
-              <div className="homeCategoryCircle">
-                {image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={image} alt={category.name} />
-                ) : (
-                  <div className="homeCategoryFallback">
-                    <span>{category.name.charAt(0).toLocaleUpperCase('tr-TR')}</span>
-                  </div>
-                )}
-
-                <div className="homeCategoryCircleShade" />
-              </div>
-
-              <strong>{category.name}</strong>
-              <span className="homeCategoryExplore">Keşfet →</span>
-            </motion.a>
-          );
-        })}
-      </div>
-
-      <style jsx>{`
-        .homeCategories {
-          padding: 110px 5vw 105px;
-          background: #fffaf7;
-          overflow: hidden;
-        }
-
-        .homeCategoriesHeading {
-          width: min(1320px, 100%);
-          margin: 0 auto 54px;
-          display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
-          align-items: end;
-          gap: 40px;
-        }
-
-        .homeCategoriesHeading .sectionEyebrow {
-          grid-column: 1 / -1;
-          margin: 0 0 -18px;
-          font-size: 11px;
-          letter-spacing: 0.2em;
-          font-weight: 700;
-        }
-
-        .homeCategoriesHeading h2 {
-          margin: 0;
-          font-size: clamp(42px, 5.4vw, 78px);
-          line-height: 0.94;
-          letter-spacing: -0.055em;
-          font-weight: 500;
-        }
-
-        .homeCategoriesHeading h2 span {
-          font-family: Georgia, 'Times New Roman', serif;
-          font-style: italic;
-          font-weight: 400;
-        }
-
-        .homeCategoriesHeading > p:last-child {
-          max-width: 440px;
-          margin: 0 0 5px auto;
-          font-size: 15px;
-          line-height: 1.8;
-          opacity: 0.65;
-        }
-
-        .homeCategoryScroller {
-          width: min(1420px, 100%);
-          margin: 0 auto;
-          display: flex;
-          gap: clamp(20px, 2.3vw, 38px);
-          overflow-x: auto;
-          padding: 6px 2px 20px;
-          scrollbar-width: none;
-          scroll-snap-type: x proximity;
-        }
-
-        .homeCategoryScroller::-webkit-scrollbar {
-          display: none;
-        }
-
-        :global(.homeCategoryItem) {
-          flex: 0 0 clamp(142px, 14vw, 205px);
-          color: inherit;
-          text-decoration: none;
-          text-align: center;
-          scroll-snap-align: start;
-        }
-
-        .homeCategoryCircle {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 1;
-          overflow: hidden;
-          border-radius: 999px;
-          background: #eadfd8;
-          box-shadow: 0 18px 45px rgba(46, 31, 24, 0.09);
-          transition: transform 0.45s ease, box-shadow 0.45s ease;
-        }
-
-        :global(.homeCategoryItem:hover) .homeCategoryCircle {
-          transform: translateY(-7px) scale(1.015);
-          box-shadow: 0 26px 58px rgba(46, 31, 24, 0.15);
-        }
-
-        .homeCategoryCircle img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.65s ease;
-        }
-
-        :global(.homeCategoryItem:hover) .homeCategoryCircle img {
-          transform: scale(1.07);
-        }
-
-        .homeCategoryCircleShade {
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          box-shadow: inset 0 0 0 1px rgba(50, 34, 28, 0.08);
-          pointer-events: none;
-        }
-
-        .homeCategoryFallback {
-          width: 100%;
-          height: 100%;
-          display: grid;
-          place-items: center;
-          background: linear-gradient(145deg, #efe2dc, #d7b9ad);
-        }
-
-        .homeCategoryFallback span {
-          font-family: Georgia, 'Times New Roman', serif;
-          font-size: 56px;
-          font-style: italic;
-          opacity: 0.55;
-        }
-
-        :global(.homeCategoryItem > strong) {
-          display: block;
-          margin-top: 20px;
-          font-size: 15px;
-          font-weight: 600;
-          letter-spacing: -0.01em;
-        }
-
-        :global(.homeCategoryExplore) {
-          display: block;
-          margin-top: 7px;
-          font-size: 10px;
-          letter-spacing: 0.13em;
-          text-transform: uppercase;
-          opacity: 0.48;
-          transition: opacity 0.25s ease;
-        }
-
-        :global(.homeCategoryItem:hover .homeCategoryExplore) {
-          opacity: 0.9;
-        }
-
-        @media (max-width: 760px) {
-          .homeCategories {
-            padding: 76px 20px 68px;
-          }
-
-          .homeCategoriesHeading {
-            display: block;
-            margin-bottom: 38px;
-          }
-
-          .homeCategoriesHeading .sectionEyebrow {
-            margin-bottom: 18px;
-          }
-
-          .homeCategoriesHeading > p:last-child {
-            margin: 24px 0 0;
-            max-width: 520px;
-          }
-
-          .homeCategoryScroller {
-            width: calc(100% + 20px);
-            gap: 18px;
-            padding-right: 20px;
-          }
-
-          :global(.homeCategoryItem) {
-            flex-basis: 128px;
-          }
-
-          :global(.homeCategoryItem > strong) {
-            margin-top: 14px;
-            font-size: 14px;
-          }
-        }
-      `}</style>
-    </section>
   );
 }
 
@@ -1319,6 +1073,148 @@ function CreateTeaser({
   );
 }
 
+function CategoryCircles({
+  categories,
+  products,
+}: {
+  categories: Category[];
+  products: Product[];
+}) {
+  const visible = categories.filter((category) => category.isActive !== false).slice(0, 10);
+
+  return (
+    <section className="shopCategories" id="categories">
+      <div className="shopSectionHeading shopSectionHeadingCentered">
+        <span>NE ARIYORSUN?</span>
+        <h2>Çiçeğini kategorisine göre seç.</h2>
+        <p>Sevdiğin tarza dokun, sana uygun buketleri hemen keşfet.</p>
+      </div>
+      <div className="categoryCircleRow">
+        {visible.map((category, index) => {
+          const product = products.find((item) =>
+            item.categories?.some((itemCategory) => itemCategory.id === category.id || itemCategory.slug === category.slug),
+          );
+          return (
+            <motion.a
+              key={category.id}
+              href={`/urunler?category=${encodeURIComponent(category.slug)}`}
+              className="categoryCircleItem"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: index * 0.04 }}
+            >
+              <span className="categoryCircleImage">
+                {product?.heroImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={product.heroImage} alt={category.name} />
+                ) : (
+                  <span className="categoryCircleFallback">✿</span>
+                )}
+              </span>
+              <strong>{category.name}</strong>
+              <small>Keşfet</small>
+            </motion.a>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function TrustStrip() {
+  return (
+    <section className="trustStrip">
+      <div><b>✦</b><span><strong>Özenle Hazırlanır</strong><small>Her buket siparişe özel</small></span></div>
+      <div><b>↗</b><span><strong>Hızlı Teslimat</strong><small>Sevdiklerine zamanında</small></span></div>
+      <div><b>♡</b><span><strong>Mutluluk Garantisi</strong><small>Her detayda Bi Buket Neşe</small></span></div>
+      <div><b>✓</b><span><strong>Güvenli Alışveriş</strong><small>Kolay ve güvenli deneyim</small></span></div>
+    </section>
+  );
+}
+
+function ProductGrid({
+  products,
+  title = 'En Sevilen Buketler',
+  eyebrow = 'Bİ BUKET NEŞE FAVORİLERİ',
+}: {
+  products: Product[];
+  title?: string;
+  eyebrow?: string;
+}) {
+  const visible = products.slice(0, 8);
+  return (
+    <section className="commerceProducts" id="products">
+      <div className="shopSectionHeading">
+        <div>
+          <span>{eyebrow}</span>
+          <h2>{title}</h2>
+        </div>
+        <a href="/urunler">Tümünü Gör <b>→</b></a>
+      </div>
+      <div className="commerceProductGrid">
+        {visible.map((product, index) => {
+          const price = getMinimumPrice(product);
+          return (
+            <motion.a
+              href={`/urunler/${product.slug}`}
+              key={product.id}
+              className="commerceProductCard"
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.5, delay: (index % 4) * 0.05 }}
+            >
+              <div className="commerceProductImage">
+                {product.heroImage && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={product.heroImage} alt={product.name} />
+                )}
+                {product.isFeatured && <span className="productBadge">ÖNE ÇIKAN</span>}
+                <span className="productHeart">♡</span>
+              </div>
+              <div className="commerceProductInfo">
+                <small>{product.categories?.[0]?.name ?? product.flowerName ?? 'Buket'}</small>
+                <h3>{product.name}</h3>
+                {product.subtitle && <p>{product.subtitle}</p>}
+                <div className="commerceProductBottom">
+                  <strong>{price !== null ? formatPrice(price) : 'Fiyatı keşfet'}</strong>
+                  <span>İncele →</span>
+                </div>
+              </div>
+            </motion.a>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function CollectionBanners({ collections }: { collections: Collection[] }) {
+  const visible = collections.filter((item) => item.isActive).slice(0, 2);
+  if (!visible.length) return null;
+  return (
+    <section className="commerceBanners">
+      {visible.map((collection, index) => {
+        const product = getCollectionProduct(collection);
+        const image = collection.image ?? product?.heroImage;
+        return (
+          <a key={collection.id} href={product ? `/urunler/${product.slug}` : '#products'} className="commerceBanner">
+            {image && <div className="commerceBannerImage" style={{ backgroundImage: `url("${image}")` }} />}
+            <div className="commerceBannerShade" />
+            <div className="commerceBannerContent">
+              <span>{index === 0 ? 'ÖZEL KOLEKSİYON' : 'SANA ÖZEL SEÇKİ'}</span>
+              <h3>{collection.name}</h3>
+              <p>{collection.subtitle ?? collection.description ?? 'Yeni favorini keşfet.'}</p>
+              <b>Keşfet →</b>
+            </div>
+          </a>
+        );
+      })}
+    </section>
+  );
+}
+
 export default function Home() {
   const [
     products,
@@ -1439,7 +1335,11 @@ export default function Home() {
             ),
         );
 
-        setCategories(categoryData);
+        setCategories(
+          categoryData
+            .filter((category) => category.isActive !== false)
+            .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+        );
       } catch (error) {
         console.error(
           'Ana sayfa verileri alınamadı:',
@@ -1632,12 +1532,14 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* LILYANA TARZI YUVARLAK KATEGORİLER */}
+      {/* LILYANA ESİNTİLİ E-TİCARET VİTRİNİ */}
       {!loading && (
-        <CategoryCircles
-          categories={categories}
-          products={products}
-        />
+        <>
+          <CategoryCircles categories={categories} products={products} />
+          <TrustStrip />
+          <ProductGrid products={[...products].sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured))} />
+          <CollectionBanners collections={collections} />
+        </>
       )}
 
       {/* INTRO */}
