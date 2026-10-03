@@ -968,8 +968,8 @@ function CollectionSection({
           yakında.
         </p>
 
-        <a href="#create">
-          Kendi buketini
+        <a href="/create-balloon">
+          Kendi balonunu
           oluştur →
         </a>
       </div>
@@ -982,15 +982,12 @@ function CreateTeaser({
 }: {
   product: Product | null;
 }) {
-  const href =
-    product
-      ? `/urunler/${product.slug}`
-      : '#collections';
+  const href = '/create-balloon';
 
   return (
     <section
       className="createTeaser"
-      id="create"
+      id="create-balloon"
     >
       <div
         className="createTeaserImage"
@@ -1028,32 +1025,30 @@ function CreateTeaser({
           }}
         >
           <p>
-            SENİN ÇİÇEĞİN
+            SENİN BALONUN
           </p>
 
           <h2>
-            Hazır bir buket
+            Hazır bir tasarım
             seçme.
             <br />
 
             <span>
-              Onu kendin yarat.
+              Balonunu kendin oluştur.
             </span>
           </h2>
 
           <p className="createTeaserDescription">
-            Çiçek sayısından
-            ambalaja, karttan
-            mesajına kadar her
-            detayı kendin
-            belirle.
+            Sana özel balonunu oluştur,
+            detaylarını seç ve hediyeni
+            kişiselleştir.
           </p>
 
           <a
             href={href}
             className="createTeaserButton"
           >
-            Buketini Oluştur
+            Balonunu Oluştur
 
             <span>
               ↗
@@ -1068,7 +1063,7 @@ function CreateTeaser({
           </span>
 
           <span>
-            SENİN HİKÂYEN
+            SENİN BALONUN
           </span>
         </div>
       </div>
@@ -1498,10 +1493,10 @@ export default function Home() {
             </a>
 
             <a
-              href="#create"
+              href="/create-balloon"
               className="secondaryButton"
             >
-              Buketini Oluştur
+              Balonunu Oluştur
             </a>
           </motion.div>
         </div>
@@ -1794,7 +1789,7 @@ export default function Home() {
         />
       )}
 
-      {/* KENDİ BUKETİNİ OLUŞTUR */}
+      {/* KENDİ BALONUNU OLUŞTUR */}
       {!loading && (
         <CreateTeaser
           product={
@@ -1838,9 +1833,9 @@ export default function Home() {
             bir cümledir.
           </p>
 
-          <a href="#create">
-            Kendi buketini
-            yarat →
+          <a href="/create-balloon">
+            Kendi balonunu
+            oluştur →
           </a>
         </div>
       </section>
