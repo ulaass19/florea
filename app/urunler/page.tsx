@@ -43,6 +43,8 @@ type Product = {
 
   createdAt?: string;
   updatedAt?: string;
+
+  itemType?: 'product' | 'balloon';
 };
 
 type SortType =
@@ -155,6 +157,10 @@ function getProductType(
       .join(' • ');
   }
 
+  if (product.itemType === 'balloon') {
+    return 'Balon';
+  }
+
   return 'Özel Buket';
 }
 
@@ -165,6 +171,10 @@ function getProductBadge(
     product.isFeatured
   ) {
     return 'Öne Çıkan';
+  }
+
+  if (product.itemType === 'balloon') {
+    return 'Balon';
   }
 
   return 'Özel Seçki';
@@ -206,30 +216,61 @@ export default function ProductsPage() {
         setLoading(true);
         setError('');
 
-        const response =
-          await fetch(
+        const [
+          productResponse,
+          balloonResponse,
+        ] = await Promise.all([
+          fetch(
             `${API_URL}/products`,
             {
-              cache:
-                'no-store',
+              cache: 'no-store',
             },
-          );
+          ),
+          fetch(
+            `${API_URL}/balloons`,
+            {
+              cache: 'no-store',
+            },
+          ),
+        ]);
 
-        if (
-          !response.ok
-        ) {
+        if (!productResponse.ok) {
           throw new Error(
             'Ürünler alınamadı.',
           );
         }
 
-        const data =
-          (await response.json()) as Product[];
+        if (!balloonResponse.ok) {
+          throw new Error(
+            'Balonlar alınamadı.',
+          );
+        }
+
+        const productData =
+          (await productResponse.json()) as Product[];
+
+        const balloonData =
+          (await balloonResponse.json()) as Product[];
+
+        const normalizedProducts =
+          productData.map((product) => ({
+            ...product,
+            itemType: 'product' as const,
+          }));
+
+        const normalizedBalloons =
+          balloonData.map((balloon) => ({
+            ...balloon,
+            itemType: 'balloon' as const,
+          }));
 
         setProducts(
-          data.filter(
+          [
+            ...normalizedProducts,
+            ...normalizedBalloons,
+          ].filter(
             (product) =>
-              product.isActive,
+              product.isActive !== false,
           ),
         );
       } catch (err) {
@@ -840,7 +881,11 @@ export default function ProductsPage() {
                         key={
                           product.id
                         }
-                        href={`/urunler/${product.slug}`}
+                        href={
+                          product.itemType === 'balloon'
+                            ? `/balonlar/${product.slug}`
+                            : `/urunler/${product.slug}`
+                        }
                         className="shopProductCard"
                         initial={{
                           opacity: 0,
@@ -915,7 +960,9 @@ export default function ProductsPage() {
                           <p>
                             {product.subtitle ??
                               product.description ??
-                              'Özenle hazırlanmış özel buket.'}
+                              product.itemType === 'balloon'
+                                ? 'Özel günlerin için seçilmiş balon.'
+                                : 'Özenle hazırlanmış özel buket.'}
                           </p>
 
                           <div className="shopProductBottom">
