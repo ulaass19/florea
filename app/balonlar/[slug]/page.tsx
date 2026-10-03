@@ -133,11 +133,11 @@ export default function BalloonDetailPage({
          * arıyoruz.
          */
         const response = await fetch(
-          `${API_URL}/products/${encodeURIComponent(slug)}`,
-          {
-            cache: 'no-store',
-          },
-        );
+  `${API_URL}/balloons/${encodeURIComponent(slug)}`,
+  {
+    cache: 'no-store',
+  },
+);
 
         if (response.status === 404) {
           setProduct(null);
