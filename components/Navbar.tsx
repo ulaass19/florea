@@ -67,10 +67,6 @@ export default function Navbar() {
           <a href="/balonlar">
             Balonlar
           </a>
-
-          <a href="/buketin-olustur">
-            Buketini Oluştur
-          </a>
         </motion.nav>
 
         <motion.div
