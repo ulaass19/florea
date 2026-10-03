@@ -9600,3 +9600,553 @@ a.contactInfoCard:hover {
 .commerceBanners{max-width:1440px;margin:0 auto;padding:0 5vw 88px;display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.commerceBanner{position:relative;min-height:430px;overflow:hidden;text-decoration:none;color:#fff;background:#5f2735}.commerceBannerImage,.commerceBannerShade{position:absolute;inset:0}.commerceBannerImage{background-size:cover;background-position:center;transition:transform .6s ease}.commerceBannerShade{background:linear-gradient(180deg,rgba(30,11,17,.04),rgba(30,11,17,.68))}.commerceBanner:hover .commerceBannerImage{transform:scale(1.035)}.commerceBannerContent{position:absolute;z-index:2;left:34px;right:34px;bottom:34px}.commerceBannerContent span{font-size:9px;font-weight:800;letter-spacing:.16em}.commerceBannerContent h3{font-family:Georgia,'Times New Roman',serif;font-size:38px;font-weight:500;margin:9px 0}.commerceBannerContent p{font-size:12px;max-width:390px;line-height:1.55;opacity:.86}.commerceBannerContent b{display:inline-block;margin-top:12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 @media(max-width:980px){.commerceProductGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.trustStrip{grid-template-columns:repeat(2,1fr)}.trustStrip>div:nth-child(2){border-right:0}.commerceBanners{grid-template-columns:1fr}.commerceBanner{min-height:360px}.categoryCircleRow{justify-content:flex-start}.shopCategories,.commerceProducts{padding-left:24px;padding-right:24px}.commerceBanners{padding-left:24px;padding-right:24px}}
 @media(max-width:600px){.shopCategories{padding-top:48px;padding-bottom:44px}.shopSectionHeading{align-items:flex-start}.shopSectionHeading h2{font-size:31px}.categoryCircleRow{gap:14px;margin-right:-24px;padding-right:24px}.categoryCircleItem{flex-basis:92px}.categoryCircleImage{width:86px;height:86px}.trustStrip{margin-bottom:10px;padding:15px 14px;grid-template-columns:1fr 1fr}.trustStrip>div{justify-content:flex-start;padding:9px 7px}.trustStrip strong{font-size:10px}.trustStrip small{font-size:8px}.commerceProducts{padding-top:44px;padding-bottom:60px}.commerceProductGrid{gap:25px 10px}.commerceProductInfo h3{font-size:13px}.commerceProductBottom{align-items:flex-start;flex-direction:column;gap:5px}.commerceProductBottom strong{font-size:14px}.commerceBanners{padding-bottom:60px;gap:12px}.commerceBanner{min-height:310px}.commerceBannerContent{left:22px;right:22px;bottom:24px}.commerceBannerContent h3{font-size:31px}}
+
+
+/* =========================================================
+   MOBILE NAVIGATION
+========================================================= */
+
+.mobileMenuButton {
+  display: none;
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.08) !important;
+
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  z-index: 1201;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.mobileMenuButton span {
+  position: absolute;
+
+  width: 16px;
+  height: 1px;
+
+  background: #ffffff;
+
+  transition:
+    transform 0.3s ease,
+    top 0.3s ease;
+}
+
+.mobileMenuButton span:first-child {
+  top: 17px;
+}
+
+.mobileMenuButton span:last-child {
+  top: 23px;
+}
+
+.mobileMenuButton.active span:first-child {
+  top: 20px;
+  transform: rotate(45deg);
+}
+
+.mobileMenuButton.active span:last-child {
+  top: 20px;
+  transform: rotate(-45deg);
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY
+========================================================= */
+
+.mobileNavOverlay {
+  display: none;
+}
+
+
+/* =========================================================
+   TABLET / MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .navbar {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 78px;
+
+    padding: 0;
+
+    z-index: 1300;
+  }
+
+  .navbar.mobileMenuIsOpen {
+    background: #21161a;
+
+    border-bottom:
+      1px solid
+      rgba(255, 255, 255, 0.1);
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .navbarInner {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 22px;
+
+    display: grid;
+
+    grid-template-columns:
+      1fr auto;
+
+    align-items: center;
+  }
+
+  .navbarLogo {
+    position: relative;
+
+    z-index: 1301;
+
+    width: max-content;
+  }
+
+  .navbarLogoCircle {
+    width: 54px;
+    height: 54px;
+  }
+
+  /*
+   * Desktop linklerini mobilde kapatıyoruz.
+   */
+  .navLinks {
+    display: none !important;
+  }
+
+  .navActions {
+    position: relative;
+
+    z-index: 1301;
+
+    display: flex;
+    align-items: center;
+
+    justify-self: end;
+
+    gap: 12px;
+  }
+
+  /*
+   * Mobilde desktop Ara butonunu gizle.
+   * Mobil menünün içinde ayrıca var.
+   */
+  .navTextButton {
+    display: none !important;
+  }
+
+  /*
+   * Sepet navbar üzerinde kalıyor.
+   */
+  .cartButton {
+    display: flex !important;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 11px !important;
+  }
+
+  .cartButton span {
+    width: 21px;
+    height: 21px;
+
+    font-size: 9px;
+  }
+
+  /*
+   * Hamburgeri göster.
+   */
+  .mobileMenuButton {
+    display: flex !important;
+  }
+
+
+  /* =========================================================
+     FULL SCREEN MOBILE MENU
+  ========================================================= */
+
+  .mobileNavOverlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1200;
+
+    display: block;
+
+    background: #21161a;
+
+    color: #ffffff;
+
+    overflow-y: auto;
+  }
+
+  .mobileNavPanel {
+    min-height: 100svh;
+
+    padding:
+      118px
+      22px
+      28px;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+
+  /* =========================================================
+     LINKS
+  ========================================================= */
+
+  .mobileNavLinks {
+    display: flex;
+
+    flex-direction: column;
+
+    border-top:
+      1px solid
+      rgba(255, 255, 255, 0.14);
+  }
+
+  .mobileNavLinks a {
+    min-height: 88px;
+
+    display: grid;
+
+    grid-template-columns:
+      38px
+      1fr
+      auto;
+
+    align-items: center;
+
+    gap: 8px;
+
+    border-bottom:
+      1px solid
+      rgba(255, 255, 255, 0.14);
+
+    font-family:
+      Georgia,
+      "Times New Roman",
+      serif;
+
+    font-size: clamp(
+      27px,
+      7vw,
+      38px
+    );
+
+    font-weight: 400;
+
+    letter-spacing: -0.025em;
+
+    color: #ffffff;
+  }
+
+  .mobileNavLinks a > span {
+    align-self: center;
+
+    font-family:
+      Arial,
+      Helvetica,
+      sans-serif;
+
+    font-size: 9px;
+
+    letter-spacing: 0.12em;
+
+    color:
+      rgba(
+        255,
+        255,
+        255,
+        0.35
+      );
+  }
+
+  .mobileNavLinks a > strong {
+    font-family:
+      Arial,
+      Helvetica,
+      sans-serif;
+
+    font-size: 18px;
+
+    font-weight: 400;
+
+    color:
+      rgba(
+        255,
+        255,
+        255,
+        0.55
+      );
+  }
+
+
+  /* BALONUNU OLUŞTUR */
+
+  .mobileNavLinks
+  .mobileCreateBalloon {
+    color: #e7bfc2;
+  }
+
+  .mobileNavLinks
+  .mobileCreateBalloon
+  > strong {
+    color: #e7bfc2;
+  }
+
+
+  /* =========================================================
+     SEARCH + CART
+  ========================================================= */
+
+  .mobileNavBottom {
+    margin-top: 38px;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .mobileNavBottom button {
+    min-width: 0;
+    min-height: 104px;
+
+    padding: 17px;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.15);
+
+    background:
+      rgba(255, 255, 255, 0.045);
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    display: grid;
+
+    grid-template-columns:
+      1fr
+      auto;
+
+    grid-template-rows:
+      auto
+      1fr;
+
+    text-align: left;
+  }
+
+  .mobileNavBottom button small {
+    grid-column:
+      1 / -1;
+
+    margin-bottom: 18px;
+
+    font-size: 8px;
+
+    letter-spacing: 0.2em;
+
+    color:
+      rgba(
+        255,
+        255,
+        255,
+        0.4
+      );
+  }
+
+  .mobileNavBottom button > span {
+    align-self: end;
+
+    font-family:
+      Georgia,
+      "Times New Roman",
+      serif;
+
+    font-size: 18px;
+  }
+
+  .mobileNavBottom button > strong {
+    align-self: end;
+
+    font-size: 16px;
+
+    font-weight: 400;
+  }
+
+  .mobileCartCount {
+    width: 28px;
+    height: 28px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    color: #21161a;
+
+    font-family:
+      Arial,
+      Helvetica,
+      sans-serif;
+
+    font-size: 10px !important;
+
+    font-weight: 700 !important;
+  }
+
+
+  /* =========================================================
+     FOOTER
+  ========================================================= */
+
+  .mobileNavFooter {
+    margin-top: auto;
+
+    padding-top: 50px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    font-size: 8px;
+
+    letter-spacing: 0.18em;
+
+    color:
+      rgba(
+        255,
+        255,
+        255,
+        0.28
+      );
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .navbar {
+    height: 72px;
+  }
+
+  .navbarInner {
+    padding: 0 16px;
+  }
+
+  .navbarLogoCircle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .navActions {
+    gap: 9px;
+  }
+
+  .cartButton {
+    font-size: 10px !important;
+  }
+
+  .mobileMenuButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mobileMenuButton span:first-child {
+    top: 16px;
+  }
+
+  .mobileMenuButton span:last-child {
+    top: 22px;
+  }
+
+  .mobileMenuButton.active span:first-child,
+  .mobileMenuButton.active span:last-child {
+    top: 19px;
+  }
+
+  .mobileNavPanel {
+    padding:
+      104px
+      16px
+      22px;
+  }
+
+  .mobileNavLinks a {
+    min-height: 76px;
+
+    grid-template-columns:
+      31px
+      1fr
+      auto;
+
+    font-size:
+      clamp(
+        23px,
+        7vw,
+        31px
+      );
+  }
+
+  .mobileNavBottom {
+    margin-top: 28px;
+  }
+
+  .mobileNavBottom button {
+    min-height: 94px;
+
+    padding: 14px;
+  }
+
+  .mobileNavBottom button > span {
+    font-size: 16px;
+  }
+
+  .mobileNavFooter {
+    padding-top: 36px;
+
+    font-size: 7px;
+  }
+}
