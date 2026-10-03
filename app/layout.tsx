@@ -8,8 +8,15 @@ import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Bi Buket Neşe — Çiçek & Balon",
+
   description:
     "Sevdiklerinize çiçek, buket ve balonlarla unutulmaz anlar gönderin.",
+
+  icons: {
+    icon: "/bi-buket-nese-logo.jpg",
+    shortcut: "/bi-buket-nese-logo.jpg",
+    apple: "/bi-buket-nese-logo.jpg",
+  },
 };
 
 export default function RootLayout({
