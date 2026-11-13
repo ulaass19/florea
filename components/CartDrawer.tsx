@@ -24,7 +24,7 @@ import {
   905551234567
 */
 const WHATSAPP_NUMBER =
-  "905551234567";
+  "905425016412";
 
 /*
   Ürün adından URL slug oluşturuyoruz.
